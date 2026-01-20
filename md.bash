@@ -1,6 +1,11 @@
 #!/bin/bash
 # md - copy last command and output to clipboard
 
+MD_VERSION="1.1.0"
+MD_REPO="Cishoon/md"
+MD_RAW_URL="https://raw.githubusercontent.com/$MD_REPO/main"
+MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
+
 [[ $- != *i* ]] && return
 
 MD_DIR="${TMPDIR:-/tmp}/md-$(id -u)"
@@ -73,7 +78,74 @@ _md_clean() {
     ' 2>/dev/null || cat
 }
 
+_md_check_update() {
+    local today=$(date +%Y-%m-%d)
+    local last_check=""
+    [[ -f "$MD_UPDATE_CHECK" ]] && last_check=$(cat "$MD_UPDATE_CHECK" 2>/dev/null)
+    
+    [[ "$last_check" == "$today" ]] && return
+    
+    echo "$today" > "$MD_UPDATE_CHECK"
+    
+    local remote_version
+    remote_version=$(curl -fsSL --connect-timeout 2 "$MD_RAW_URL/md.bash" 2>/dev/null | grep '^MD_VERSION=' | head -1 | cut -d'"' -f2)
+    
+    if [[ -n "$remote_version" ]] && [[ "$remote_version" != "$MD_VERSION" ]]; then
+        echo "md: new version available ($MD_VERSION -> $remote_version)"
+        echo "    run 'md update' to upgrade"
+    fi
+}
+
+_md_update() {
+    echo "Updating md..."
+    curl -fsSL "$MD_RAW_URL/md.bash" -o "$HOME/.md/md.sh" && \
+    echo "Updated. Restart shell or run: source ~/.bashrc"
+}
+
+_md_uninstall() {
+    echo "Uninstalling md..."
+    
+    local rc_file="$HOME/.bashrc"
+    if [[ "$(uname)" == "Darwin" ]]; then
+        sed -i '' '/\.md\/md\.sh/d' "$rc_file" 2>/dev/null
+        sed -i '' '/md - copy last command/d' "$rc_file" 2>/dev/null
+    else
+        sed -i '/\.md\/md\.sh/d' "$rc_file" 2>/dev/null
+        sed -i '/md - copy last command/d' "$rc_file" 2>/dev/null
+    fi
+    
+    rm -rf "$HOME/.md"
+    rm -rf "${TMPDIR:-/tmp}/md-"*
+    
+    echo "Done. Restart shell."
+}
+
 md() {
+    case "$1" in
+        update)
+            _md_update
+            return
+            ;;
+        uninstall)
+            _md_uninstall
+            return
+            ;;
+        version|-v|--version)
+            echo "md $MD_VERSION"
+            return
+            ;;
+        help|-h|--help)
+            echo "md - copy last command and output to clipboard"
+            echo ""
+            echo "Usage:"
+            echo "  md            copy last command to clipboard"
+            echo "  md update     update to latest version"
+            echo "  md uninstall  remove md"
+            echo "  md version    show version"
+            return
+            ;;
+    esac
+    
     [[ -z "$_md_last_cmd" ]] && { echo "no record" >&2; return 1; }
     
     local len=$(( _md_last_end - _md_last_start ))
@@ -85,3 +157,6 @@ md() {
         echo "$output" | _md_clean
     } | _md_copy && echo "copied"
 }
+
+# Check for updates daily (background, non-blocking)
+(_md_check_update &) 2>/dev/null

@@ -1,19 +1,21 @@
 #!/bin/zsh
 # md - copy last command and output to clipboard
 
+MD_VERSION="1.1.0"
+MD_REPO="Cishoon/md"
+MD_RAW_URL="https://raw.githubusercontent.com/$MD_REPO/main"
 MD_FILE="${TMPDIR:-/tmp}/.md_output_$$"
+MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
 
 if [[ -z "$_MD_INIT" ]]; then
     _MD_INIT=1
     _MD_LAST_CMD=""
-    _MD_LAST_OUTPUT=""
     _MD_EXCLUDE='^[[:space:]]*(md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo)([[:space:]]|$)'
     
     autoload -Uz add-zsh-hook
     
     _md_preexec() {
         local cmd="$1"
-        # 排除 md 和其他命令
         [[ "$cmd" =~ $_MD_EXCLUDE ]] && return
         
         _MD_CURRENT_CMD="$cmd"
@@ -22,13 +24,10 @@ if [[ -z "$_MD_INIT" ]]; then
     }
     
     _md_precmd() {
-        # 如果没有当前命令，跳过
         [[ -z "$_MD_CURRENT_CMD" ]] && return
         
-        # 恢复输出
         exec 1>&3 2>&4 3>&- 4>&-
         
-        # 保存为"上一条命令"供 md 使用
         _MD_LAST_CMD="$_MD_CURRENT_CMD"
         _MD_CURRENT_CMD=""
     }
@@ -55,7 +54,69 @@ _md_clean() {
     ' 2>/dev/null || cat
 }
 
+_md_check_update() {
+    local today=$(date +%Y-%m-%d)
+    local last_check=""
+    [[ -f "$MD_UPDATE_CHECK" ]] && last_check=$(cat "$MD_UPDATE_CHECK" 2>/dev/null)
+    
+    [[ "$last_check" == "$today" ]] && return
+    
+    echo "$today" > "$MD_UPDATE_CHECK"
+    
+    local remote_version
+    remote_version=$(curl -fsSL --connect-timeout 2 "$MD_RAW_URL/md.zsh" 2>/dev/null | grep '^MD_VERSION=' | head -1 | cut -d'"' -f2)
+    
+    if [[ -n "$remote_version" ]] && [[ "$remote_version" != "$MD_VERSION" ]]; then
+        echo "md: new version available ($MD_VERSION -> $remote_version)"
+        echo "    run 'md update' to upgrade"
+    fi
+}
+
+_md_update() {
+    echo "Updating md..."
+    curl -fsSL "$MD_RAW_URL/md.zsh" -o "$HOME/.md/md.sh" && \
+    echo "Updated. Restart shell or run: source ~/.zshrc"
+}
+
+_md_uninstall() {
+    echo "Uninstalling md..."
+    
+    local rc_file="$HOME/.zshrc"
+    [[ -f "$rc_file" ]] && sed -i '' '/\.md\/md\.sh/d' "$rc_file" 2>/dev/null
+    [[ -f "$rc_file" ]] && sed -i '' '/md - copy last command/d' "$rc_file" 2>/dev/null
+    
+    rm -rf "$HOME/.md"
+    rm -f "${TMPDIR:-/tmp}/.md_output_"*
+    
+    echo "Done. Restart shell."
+}
+
 md() {
+    case "$1" in
+        update)
+            _md_update
+            return
+            ;;
+        uninstall)
+            _md_uninstall
+            return
+            ;;
+        version|-v|--version)
+            echo "md $MD_VERSION"
+            return
+            ;;
+        help|-h|--help)
+            echo "md - copy last command and output to clipboard"
+            echo ""
+            echo "Usage:"
+            echo "  md            copy last command to clipboard"
+            echo "  md update     update to latest version"
+            echo "  md uninstall  remove md"
+            echo "  md version    show version"
+            return
+            ;;
+    esac
+    
     if [[ -z "$_MD_LAST_CMD" ]] || [[ ! -s "$MD_FILE" ]]; then
         echo "no record" >&2
         return 1
@@ -66,3 +127,6 @@ md() {
         cat "$MD_FILE" 2>/dev/null | _md_clean
     } | _md_copy && echo "copied"
 }
+
+# Check for updates daily (background, non-blocking)
+(_md_check_update &) 2>/dev/null
