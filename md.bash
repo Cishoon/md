@@ -49,8 +49,21 @@ _md_copy() {
     local input
     input=$(cat)
     local encoded
-    encoded=$(echo -n "$input" | base64 | tr -d '\n')
-    printf '\033]52;c;%s\a' "$encoded"
+    encoded=$(printf '%s' "$input" | base64 | tr -d '\n')
+    local osc
+    osc=$(printf '\033]52;c;%s\a' "$encoded")
+
+    # Prefer tmux clipboard helper if available; it handles OSC 52 safely
+    if [[ -n "$TMUX" ]] && command -v tmux >/dev/null 2>&1; then
+        tmux set-buffer -w -- "$input" >/dev/null 2>&1 && return 0
+    fi
+
+    # Wrap OSC 52 for tmux so it passes through to the host terminal
+    if [[ -n "$TMUX" ]]; then
+        printf '\033Ptmux;%s\033\\' "$osc"
+    else
+        printf '%s' "$osc"
+    fi
 }
 
 _md_clean() {
