@@ -13,18 +13,23 @@ if [[ -z "$_MD_INIT" ]]; then
     _MD_INIT=1
     _MD_LAST_CMD=""
     _MD_CURRENT_CMD=""
+    _MD_CAPTURE_ACTIVE=0
+    _MD_READY=0
     _MD_EXCLUDE='^[[:space:]]*(md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo|nload|iftop|watch|tail|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|bat|delta)([[:space:]]|$)'
     
+    _md_mark_prompt() {
+        _MD_READY=1
+    }
+    
     _md_debug() {
-        [[ $BASH_COMMAND == _md_* ]] && return 0
-        [[ $BASH_COMMAND == "$PROMPT_COMMAND" ]] && return 0
+        [[ $_MD_READY -eq 1 ]] || return 0
+        _MD_READY=0
         
-        local cmd
-        cmd="$(history 1 | sed 's/^[ ]*[0-9]*[ ]*//')"
-        
+        local cmd="$BASH_COMMAND"
+        [[ $cmd == _md_* ]] && return 0
         [[ "$cmd" =~ $_MD_EXCLUDE ]] && return 0
-        [[ -n "$_MD_CURRENT_CMD" ]] && return 0
         
+        _MD_CAPTURE_ACTIVE=1
         _MD_CURRENT_CMD="$cmd"
         exec 3>&1 4>&2
         exec > >(tee "$MD_FILE") 2>&1
@@ -33,16 +38,21 @@ if [[ -z "$_MD_INIT" ]]; then
     }
     
     _md_precmd() {
-        [[ -z "$_MD_CURRENT_CMD" ]] && return
+        [[ $_MD_CAPTURE_ACTIVE -eq 0 ]] && return
         
         exec 1>&3 2>&4 3>&- 4>&-
         
-        _MD_LAST_CMD="$_MD_CURRENT_CMD"
+        local last_cmd
+        last_cmd=$(history 1 | sed 's/^[ ]*[0-9]*[ ]*//') 2>/dev/null || last_cmd=""
+        [[ -z "$last_cmd" ]] && last_cmd="$_MD_CURRENT_CMD"
+        
+        _MD_LAST_CMD="$last_cmd"
+        _MD_CAPTURE_ACTIVE=0
         _MD_CURRENT_CMD=""
     }
     
     trap '_md_debug' DEBUG
-    PROMPT_COMMAND="_md_precmd${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+    PROMPT_COMMAND="_md_precmd${PROMPT_COMMAND:+; $PROMPT_COMMAND}; _md_mark_prompt"
 fi
 
 _md_copy() {
