@@ -31,25 +31,9 @@
 
 ## 📦 安装
 
-**一键安装 (macOS/Linux)：**
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
 source ~/.zshrc  # 或 ~/.bashrc
-```
-
-**一键安装 (Windows PowerShell)：**
-
-```powershell
-irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
-```
-
-**或手动安装：**
-
-```bash
-git clone https://github.com/Cishoon/md.git
-cd md && ./install.sh        # macOS/Linux
-cd md && .\install.ps1       # Windows PowerShell
 ```
 
 ## 🔧 使用
@@ -69,6 +53,16 @@ Error: Cannot find module 'xxx'
     ...
 ```
 
+## 📖 命令
+
+| 命令 | 说明 |
+|:----:|:-----|
+| `md` | 复制上一条命令到剪贴板 |
+| `md update` | 更新到最新版本 |
+| `md uninstall` | 卸载 |
+| `md version` | 显示版本 |
+| `md help` | 帮助 |
+
 ## 🖥️ 支持平台
 
 | 平台 | Shell | 
@@ -76,16 +70,9 @@ Error: Cannot find module 'xxx'
 | macOS | zsh / bash |
 | Linux | zsh / bash |
 | WSL | bash |
-| Windows | PowerShell |
 | SSH 远程 | zsh / bash |
 
 > 使用 OSC 52 协议复制到剪贴板，需要终端支持（iTerm2、Windows Terminal、Alacritty、kitty 等现代终端均支持）
-
-## �️ 卸载
-
-```bash
-./install.sh uninstall
-```
 
 ## ⚙️ 原理
 
