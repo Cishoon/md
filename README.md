@@ -13,21 +13,28 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-blue" alt="Platform">
   <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash-green" alt="Shell">
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
 </p>
 
 ---
 
-报错了？`md` 一下，直接丢给 AI。
+## 😫 痛点
+
+- 跑 `cmake`、`gradlew`、AI 模型训练，输出刷了几百行，想找报错得往上翻半天
+- 在 tmux 里跑命令，输出超出屏幕就看不到了，想复制完整输出巨麻烦
+- 想把报错丢给 AI，还得手动选中、复制，滑动半天
+
+**现在，`md` 一下就搞定。**
 
 ## ✨ 特性
 
-- 🚀 **无感使用** - 自动捕获，无需改变任何习惯
-- 📋 **一键复制** - 命令 + 输出，格式清晰
-- 🌍 **跨平台** - macOS / Linux / WSL / SSH 远程
-- 🐚 **多 Shell** - zsh / bash
+- 🚀 **完全无感** - 自动捕获所有命令输出，无需改变任何习惯
+- 📋 **一键复制** - 命令 + 完整输出，直接粘贴给 AI
+- 🔧 **一键安装 / 卸载** - 一条命令搞定
+- 🌍 **多平台** - macOS / 所有 Linux 发行版
+- 🖥️ **SSH 友好** - 服务器上 `md`，直接复制到本地剪贴板
 
 ## 📦 安装
 
@@ -39,18 +46,20 @@ source ~/.zshrc  # 或 ~/.bashrc
 ## 🔧 使用
 
 ```bash
-npm run build    # 报错了
+cmake ..         # 输出了 500 行，报错在中间某处
 md               # copied
 ```
 
 Ctrl+V 粘贴，剪贴板内容：
 
 ```
-$ npm run build
-Error: Cannot find module 'xxx'
-    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:933:15)
-    at Function.Module._load (node:internal/modules/cjs/loader:778:27)
-    ...
+$ cmake ..
+-- The C compiler identification is GNU 9.4.0
+-- The CXX compiler identification is GNU 9.4.0
+...
+CMake Error at CMakeLists.txt:42:
+  Could not find package XXX
+...
 ```
 
 ## 📖 命令
@@ -68,9 +77,8 @@ Error: Cannot find module 'xxx'
 | 平台 | Shell | 
 |:----:|:-----:|
 | macOS | zsh / bash |
-| Linux | zsh / bash |
-| WSL | bash |
-| SSH 远程 | zsh / bash |
+| Linux (所有发行版) | zsh / bash |
+| SSH 远程服务器 | zsh / bash |
 
 > 使用 OSC 52 协议复制到剪贴板，需要终端支持（iTerm2、Windows Terminal、Alacritty、kitty 等现代终端均支持）
 

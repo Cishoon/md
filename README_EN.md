@@ -13,21 +13,28 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-blue" alt="Platform">
   <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash-green" alt="Shell">
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
 </p>
 
 ---
 
-Got an error? Just type `md` and paste it to your AI assistant.
+## 😫 The Pain
+
+- Running `cmake`, `gradlew`, or AI model training - output floods the screen, scrolling forever to find the error
+- Commands in tmux - output goes beyond the buffer, nearly impossible to copy everything
+- Want to paste the error to AI? Manual selection is tedious and error-prone
+
+**Now, just type `md`.**
 
 ## ✨ Features
 
-- 🚀 **Seamless** - Auto-capture, no workflow changes needed
-- 📋 **One keystroke** - Command + output, clean format
-- 🌍 **Cross-platform** - macOS / Linux / WSL / SSH Remote
-- 🐚 **Multi-shell** - zsh / bash
+- 🚀 **Seamless** - Auto-captures all command output, zero workflow changes
+- 📋 **One keystroke** - Command + full output, ready to paste to AI
+- 🔧 **One-line install / uninstall** - Simple as it gets
+- 🌍 **Cross-platform** - macOS / all Linux distros
+- 🖥️ **SSH friendly** - Run `md` on server, copies to your local clipboard
 
 ## 📦 Installation
 
@@ -39,18 +46,20 @@ source ~/.zshrc  # or ~/.bashrc
 ## 🔧 Usage
 
 ```bash
-npm run build    # got an error
+cmake ..         # 500 lines of output, error somewhere in the middle
 md               # copied
 ```
 
 Ctrl+V to paste, clipboard content:
 
 ```
-$ npm run build
-Error: Cannot find module 'xxx'
-    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:933:15)
-    at Function.Module._load (node:internal/modules/cjs/loader:778:27)
-    ...
+$ cmake ..
+-- The C compiler identification is GNU 9.4.0
+-- The CXX compiler identification is GNU 9.4.0
+...
+CMake Error at CMakeLists.txt:42:
+  Could not find package XXX
+...
 ```
 
 ## 📖 Commands
@@ -68,8 +77,7 @@ Error: Cannot find module 'xxx'
 | Platform | Shell | 
 |:--------:|:-----:|
 | macOS | zsh / bash |
-| Linux | zsh / bash |
-| WSL | bash |
+| Linux (all distros) | zsh / bash |
 | SSH Remote | zsh / bash |
 
 > Uses OSC 52 protocol for clipboard access. Requires terminal support (iTerm2, Windows Terminal, Alacritty, kitty, etc.)
