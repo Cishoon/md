@@ -31,19 +31,25 @@ Got an error? Just type `md` and paste it to your AI assistant.
 
 ## 📦 Installation
 
-**One-line install:**
+**One-line install (macOS/Linux):**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
 source ~/.zshrc  # or ~/.bashrc
 ```
 
+**One-line install (Windows PowerShell):**
+
+```powershell
+irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
+```
+
 **Or manual install:**
 
 ```bash
 git clone https://github.com/Cishoon/md.git
-cd md && ./install.sh
-source ~/.zshrc  # or ~/.bashrc
+cd md && ./install.sh        # macOS/Linux
+cd md && .\install.ps1       # Windows PowerShell
 ```
 
 ## 🔧 Usage
@@ -70,6 +76,7 @@ Error: Cannot find module 'xxx'
 | macOS | zsh / bash |
 | Linux | zsh / bash |
 | WSL | bash |
+| Windows | PowerShell |
 | SSH Remote | zsh / bash |
 
 > Uses OSC 52 protocol for clipboard access. Requires terminal support (iTerm2, Windows Terminal, Alacritty, kitty, etc.)
