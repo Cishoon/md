@@ -28,6 +28,8 @@ if [[ -z "$_MD_INIT" ]]; then
     _md_last_end=0
     _md_start=0
     _md_end=0
+    _md_in_prompt=0
+    _md_rc=0
     
     _md_filesize() {
         stat -f%z "$MD_LOG" 2>/dev/null || stat -c%s "$MD_LOG" 2>/dev/null || wc -c < "$MD_LOG"
@@ -36,6 +38,7 @@ if [[ -z "$_MD_INIT" ]]; then
     _md_debug() {
         [[ $_md_ready != 1 ]] && return 0
         [[ $BASH_COMMAND == _md_* ]] && return 0
+        [[ $_md_in_prompt == 1 ]] && return 0
         [[ $BASH_COMMAND =~ $_MD_EXCLUDE ]] && return 0
         
         _md_current_cmd="$BASH_COMMAND"
@@ -45,7 +48,7 @@ if [[ -z "$_MD_INIT" ]]; then
     }
     
     _md_prompt() {
-        local rc=$?
+        local rc=${_md_rc:-$?}
         if [[ -n "$_md_current_cmd" ]]; then
             _md_end="$(_md_filesize)"
             _md_last_cmd="$_md_current_cmd"
@@ -54,10 +57,21 @@ if [[ -z "$_MD_INIT" ]]; then
             _md_current_cmd=""
         fi
         _md_ready=1
+        _md_rc=0
+    }
+    
+    _md_pre_prompt() {
+        _md_rc=$?
+        _md_in_prompt=1
+    }
+    
+    _md_post_prompt() {
+        _md_in_prompt=0
+        _md_prompt
     }
     
     trap '_md_debug' DEBUG
-    PROMPT_COMMAND="_md_prompt${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+    PROMPT_COMMAND="_md_pre_prompt${PROMPT_COMMAND:+; $PROMPT_COMMAND}; _md_post_prompt"
 fi
 
 _md_copy() {
