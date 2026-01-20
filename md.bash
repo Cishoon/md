@@ -6,6 +6,7 @@ MD_REPO="Cishoon/md"
 MD_RAW_URL="https://raw.githubusercontent.com/$MD_REPO/main"
 MD_FILE="${TMPDIR:-/tmp}/.md_output_$$"
 MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
+_MD_MAX_SIZE=$((32 * 1024 * 1024))
 
 [[ $- != *i* ]] && return
 
@@ -49,6 +50,8 @@ if [[ -z "$_MD_INIT" ]]; then
         _MD_LAST_CMD="$last_cmd"
         _MD_CAPTURE_ACTIVE=0
         _MD_CURRENT_CMD=""
+
+        _md_trim_file
     }
     
     trap '_md_debug' DEBUG
@@ -74,6 +77,15 @@ _md_copy() {
     else
         printf '%s' "$osc"
     fi
+}
+
+_md_trim_file() {
+    [[ ! -f "$MD_FILE" ]] && return
+    local size
+    size=$(wc -c < "$MD_FILE" 2>/dev/null || echo 0)
+    (( size <= _MD_MAX_SIZE )) && return
+    local tmp="${MD_FILE}.tmp"
+    tail -c "$_MD_MAX_SIZE" "$MD_FILE" > "$tmp" 2>/dev/null && mv "$tmp" "$MD_FILE"
 }
 
 _md_clean() {
