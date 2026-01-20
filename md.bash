@@ -10,8 +10,16 @@ MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
 
 MD_DIR="${TMPDIR:-/tmp}/md-$(id -u)"
 MD_LOG="$MD_DIR/session_$$.log"
+MD_LAST_OUTPUT="$MD_DIR/last_output_$$"
 
 mkdir -p "$MD_DIR" 2>/dev/null
+
+# Clean up stale files from dead processes
+for f in "$MD_DIR"/session_*.log "$MD_DIR"/last_output_*; do
+    [[ -f "$f" ]] || continue
+    pid=$(echo "$f" | grep -oE '[0-9]+$' | head -1)
+    [[ -n "$pid" ]] && ! kill -0 "$pid" 2>/dev/null && rm -f "$f"
+done
 
 _MD_EXCLUDE='^[[:space:]]*(md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo)([[:space:]]|$)'
 
@@ -52,8 +60,18 @@ if [[ -z "$_MD_INIT" ]]; then
         if [[ -n "$_md_current_cmd" ]]; then
             _md_end="$(_md_filesize)"
             _md_last_cmd="$_md_current_cmd"
-            _md_last_start="$_md_start"
-            _md_last_end="$_md_end"
+            
+            # Extract last output and save to separate file, then truncate log
+            local len=$(( _md_end - _md_start ))
+            if (( len > 0 )); then
+                dd if="$MD_LOG" bs=1 skip="$_md_start" count="$len" 2>/dev/null > "$MD_LAST_OUTPUT"
+            else
+                : > "$MD_LAST_OUTPUT"
+            fi
+            
+            # Truncate log file to save disk space
+            : > "$MD_LOG"
+            
             _md_current_cmd=""
         fi
         _md_ready=1
@@ -162,9 +180,8 @@ md() {
     
     [[ -z "$_md_last_cmd" ]] && { echo "no record" >&2; return 1; }
     
-    local len=$(( _md_last_end - _md_last_start ))
     local output=""
-    (( len > 0 )) && output=$(dd if="$MD_LOG" bs=1 skip="$_md_last_start" count="$len" 2>/dev/null)
+    [[ -s "$MD_LAST_OUTPUT" ]] && output=$(cat "$MD_LAST_OUTPUT")
     
     {
         echo "$ $_md_last_cmd"
