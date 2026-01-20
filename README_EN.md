@@ -65,13 +65,14 @@ Error: Cannot find module 'xxx'
 
 ## 🖥️ Supported Platforms
 
-| Platform | Shell | Clipboard Tool |
-|:--------:|:-----:|:--------------:|
-| macOS | zsh / bash | pbcopy (built-in) |
-| Linux | zsh / bash | xclip / xsel |
-| WSL | bash | clip.exe (built-in) |
+| Platform | Shell | 
+|:--------:|:-----:|
+| macOS | zsh / bash |
+| Linux | zsh / bash |
+| WSL | bash |
+| SSH Remote | zsh / bash |
 
-> Linux users need to install clipboard tool: `sudo apt install xclip`
+> Uses OSC 52 protocol for clipboard access. Requires terminal support (iTerm2, Windows Terminal, Alacritty, kitty, etc.)
 
 ## 🗑️ Uninstall
 

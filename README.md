@@ -26,7 +26,7 @@
 
 - 🚀 **无感使用** - 自动捕获，无需改变任何习惯
 - 📋 **一键复制** - 命令 + 输出，格式清晰
-- 🌍 **跨平台** - macOS / Linux / WSL
+- 🌍 **跨平台** - macOS / Linux / WSL / SSH 远程
 - 🐚 **多 Shell** - zsh / bash
 
 ## 📦 安装
@@ -63,17 +63,18 @@ Error: Cannot find module 'xxx'
     ...
 ```
 
-## �️ 支持平台
+## 🖥️ 支持平台
 
-| 平台 | Shell | 剪贴板工具 |
-|:----:|:-----:|:----------:|
-| macOS | zsh / bash | pbcopy (内置) |
-| Linux | zsh / bash | xclip / xsel |
-| WSL | bash | clip.exe (内置) |
+| 平台 | Shell | 
+|:----:|:-----:|
+| macOS | zsh / bash |
+| Linux | zsh / bash |
+| WSL | bash |
+| SSH 远程 | zsh / bash |
 
-> Linux 用户需安装剪贴板工具：`sudo apt install xclip`
+> 使用 OSC 52 协议复制到剪贴板，需要终端支持（iTerm2、Windows Terminal、Alacritty、kitty 等现代终端均支持）
 
-## �🗑️ 卸载
+## �️ 卸载
 
 ```bash
 ./install.sh uninstall

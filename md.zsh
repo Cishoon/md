@@ -38,18 +38,11 @@ if [[ -z "$_MD_INIT" ]]; then
 fi
 
 _md_copy() {
-    if command -v pbcopy &>/dev/null; then
-        pbcopy
-    elif command -v xclip &>/dev/null; then
-        xclip -selection clipboard
-    elif command -v xsel &>/dev/null; then
-        xsel --clipboard --input
-    elif command -v clip.exe &>/dev/null; then
-        clip.exe
-    else
-        echo "no clipboard tool found" >&2
-        return 1
-    fi
+    local input
+    input=$(cat)
+    local encoded
+    encoded=$(echo -n "$input" | base64 | tr -d '\n')
+    printf '\033]52;c;%s\a' "$encoded"
 }
 
 _md_clean() {
