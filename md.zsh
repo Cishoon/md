@@ -1,7 +1,7 @@
 #!/bin/zsh
 # md - copy last command and output to clipboard
 
-MD_VERSION="1.1.0"
+MD_VERSION="1.2.0"
 MD_REPO="Cishoon/md"
 MD_RAW_URL="https://raw.githubusercontent.com/$MD_REPO/main"
 MD_FILE="${TMPDIR:-/tmp}/.md_output_$$"
@@ -10,7 +10,7 @@ MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
 if [[ -z "$_MD_INIT" ]]; then
     _MD_INIT=1
     _MD_LAST_CMD=""
-    _MD_EXCLUDE='^[[:space:]]*(md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo)([[:space:]]|$)'
+    _MD_EXCLUDE='^[[:space:]]*(md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo|nload|iftop|watch|tail|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|bat|delta)([[:space:]]|$)'
     
     autoload -Uz add-zsh-hook
     

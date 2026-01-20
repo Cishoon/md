@@ -1,94 +1,48 @@
 #!/bin/bash
 # md - copy last command and output to clipboard
 
-MD_VERSION="1.1.0"
+MD_VERSION="1.2.0"
 MD_REPO="Cishoon/md"
 MD_RAW_URL="https://raw.githubusercontent.com/$MD_REPO/main"
+MD_FILE="${TMPDIR:-/tmp}/.md_output_$$"
 MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
 
 [[ $- != *i* ]] && return
 
-MD_DIR="${TMPDIR:-/tmp}/md-$(id -u)"
-MD_LOG="$MD_DIR/session_$$.log"
-MD_LAST_OUTPUT="$MD_DIR/last_output_$$"
-
-mkdir -p "$MD_DIR" 2>/dev/null
-
-# Clean up stale files from dead processes
-for f in "$MD_DIR"/session_*.log "$MD_DIR"/last_output_*; do
-    [[ -f "$f" ]] || continue
-    pid=$(basename "$f" | grep -oE '[0-9]+')
-    [[ -n "$pid" ]] && ! kill -0 "$pid" 2>/dev/null && rm -f "$f"
-done
-
-_MD_EXCLUDE='^[[:space:]]*(md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo)([[:space:]]|$)'
-
 if [[ -z "$_MD_INIT" ]]; then
-    export _MD_INIT=1
-    
-    exec 3>&1 4>&2
-    exec > >(tee -a "$MD_LOG" >&3) 2> >(tee -a "$MD_LOG" >&4)
-    
-    _md_ready=1
-    _md_current_cmd=""
-    _md_last_cmd=""
-    _md_start=0
-    _md_end=0
-    _md_in_prompt=0
-    _md_rc=0
-    
-    _md_filesize() {
-        stat -f%z "$MD_LOG" 2>/dev/null || stat -c%s "$MD_LOG" 2>/dev/null || wc -c < "$MD_LOG"
-    }
+    _MD_INIT=1
+    _MD_LAST_CMD=""
+    _MD_CURRENT_CMD=""
+    _MD_EXCLUDE='^[[:space:]]*(md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo|nload|iftop|watch|tail|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|bat|delta)([[:space:]]|$)'
     
     _md_debug() {
-        [[ $_md_ready != 1 ]] && return 0
         [[ $BASH_COMMAND == _md_* ]] && return 0
-        [[ $_md_in_prompt == 1 ]] && return 0
-        [[ $BASH_COMMAND =~ $_MD_EXCLUDE ]] && return 0
+        [[ $BASH_COMMAND == "$PROMPT_COMMAND" ]] && return 0
         
-        # Get full command line from history (handles pipes correctly)
-        _md_current_cmd="$(history 1 | sed 's/^[ ]*[0-9]*[ ]*//')"
-        _md_start="$(_md_filesize)"
-        _md_ready=0
+        local cmd
+        cmd="$(history 1 | sed 's/^[ ]*[0-9]*[ ]*//')"
+        
+        [[ "$cmd" =~ $_MD_EXCLUDE ]] && return 0
+        [[ -n "$_MD_CURRENT_CMD" ]] && return 0
+        
+        _MD_CURRENT_CMD="$cmd"
+        exec 3>&1 4>&2
+        exec > >(tee "$MD_FILE") 2>&1
+        
         return 0
     }
     
-    _md_prompt() {
-        local rc=${_md_rc:-$?}
-        if [[ -n "$_md_current_cmd" ]]; then
-            _md_end="$(_md_filesize)"
-            _md_last_cmd="$_md_current_cmd"
-            
-            # Extract last output and save to separate file, then truncate log
-            local len=$(( _md_end - _md_start ))
-            if (( len > 0 )); then
-                dd if="$MD_LOG" bs=1 skip="$_md_start" count="$len" 2>/dev/null > "$MD_LAST_OUTPUT"
-            else
-                : > "$MD_LAST_OUTPUT"
-            fi
-            
-            # Truncate log file to save disk space
-            : > "$MD_LOG"
-            
-            _md_current_cmd=""
-        fi
-        _md_ready=1
-        _md_rc=0
-    }
-    
-    _md_pre_prompt() {
-        _md_rc=$?
-        _md_in_prompt=1
-    }
-    
-    _md_post_prompt() {
-        _md_in_prompt=0
-        _md_prompt
+    _md_precmd() {
+        [[ -z "$_MD_CURRENT_CMD" ]] && return
+        
+        exec 1>&3 2>&4 3>&- 4>&-
+        
+        _MD_LAST_CMD="$_MD_CURRENT_CMD"
+        _MD_CURRENT_CMD=""
     }
     
     trap '_md_debug' DEBUG
-    PROMPT_COMMAND="_md_pre_prompt${PROMPT_COMMAND:+; $PROMPT_COMMAND}; _md_post_prompt"
+    PROMPT_COMMAND="_md_precmd${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 fi
 
 _md_copy() {
@@ -146,7 +100,7 @@ _md_uninstall() {
     fi
     
     rm -rf "$HOME/.md"
-    rm -rf "${TMPDIR:-/tmp}/md-"*
+    rm -f "${TMPDIR:-/tmp}/.md_output_"*
     
     echo "Done. Restart shell."
 }
@@ -177,14 +131,14 @@ md() {
             ;;
     esac
     
-    [[ -z "$_md_last_cmd" ]] && { echo "no record" >&2; return 1; }
-    
-    local output=""
-    [[ -s "$MD_LAST_OUTPUT" ]] && output=$(cat "$MD_LAST_OUTPUT")
+    if [[ -z "$_MD_LAST_CMD" ]] || [[ ! -s "$MD_FILE" ]]; then
+        echo "no record" >&2
+        return 1
+    fi
     
     {
-        echo "$ $_md_last_cmd"
-        echo "$output" | _md_clean
+        echo "$ $_MD_LAST_CMD"
+        cat "$MD_FILE" 2>/dev/null | _md_clean
     } | _md_copy && echo "copied"
 }
 
