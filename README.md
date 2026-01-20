@@ -1,10 +1,24 @@
-# md
+<p align="center">
+  <img src="logo.png" alt="md logo" width="120">
+</p>
 
-> **M**essage **D**ump - 一键复制上一条命令到剪贴板
+<h1 align="center">md</h1>
 
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL-blue)]()
-[![Shell](https://img.shields.io/badge/shell-zsh%20%7C%20bash-green)]()
-[![License](https://img.shields.io/badge/license-MIT-yellow)]()
+<p align="center">
+  <b>M</b>essage <b>D</b>ump - 一键复制上一条命令到剪贴板
+</p>
+
+<p align="center">
+  <a href="README_EN.md">English</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash-green" alt="Shell">
+  <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
+</p>
+
+---
 
 报错了？`md` 一下，直接丢给 AI。
 
@@ -40,7 +54,7 @@ Error: Cannot find module 'xxx'
     ...
 ```
 
-## 🖥️ 支持平台
+## �️ 支持平台
 
 | 平台 | Shell | 剪贴板工具 |
 |:----:|:-----:|:----------:|
@@ -50,7 +64,7 @@ Error: Cannot find module 'xxx'
 
 > Linux 用户需安装剪贴板工具：`sudo apt install xclip`
 
-## 🗑️ 卸载
+## �🗑️ 卸载
 
 ```bash
 ./install.sh uninstall

@@ -1,10 +1,24 @@
-# md
+<p align="center">
+  <img src="logo.png" alt="md logo" width="120">
+</p>
 
-> **M**essage **D**ump - Copy last command and output to clipboard with one keystroke
+<h1 align="center">md</h1>
 
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL-blue)]()
-[![Shell](https://img.shields.io/badge/shell-zsh%20%7C%20bash-green)]()
-[![License](https://img.shields.io/badge/license-MIT-yellow)]()
+<p align="center">
+  <b>M</b>essage <b>D</b>ump - Copy last command and output to clipboard with one keystroke
+</p>
+
+<p align="center">
+  <a href="README.md">中文</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash-green" alt="Shell">
+  <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
+</p>
+
+---
 
 Got an error? Just type `md` and paste it to your AI assistant.
 
