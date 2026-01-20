@@ -17,7 +17,7 @@ mkdir -p "$MD_DIR" 2>/dev/null
 # Clean up stale files from dead processes
 for f in "$MD_DIR"/session_*.log "$MD_DIR"/last_output_*; do
     [[ -f "$f" ]] || continue
-    pid=$(echo "$f" | grep -oE '[0-9]+$' | head -1)
+    pid=$(basename "$f" | grep -oE '[0-9]+')
     [[ -n "$pid" ]] && ! kill -0 "$pid" 2>/dev/null && rm -f "$f"
 done
 
@@ -32,8 +32,6 @@ if [[ -z "$_MD_INIT" ]]; then
     _md_ready=1
     _md_current_cmd=""
     _md_last_cmd=""
-    _md_last_start=0
-    _md_last_end=0
     _md_start=0
     _md_end=0
     _md_in_prompt=0
