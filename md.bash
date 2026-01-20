@@ -49,7 +49,8 @@ if [[ -z "$_MD_INIT" ]]; then
         [[ $_md_in_prompt == 1 ]] && return 0
         [[ $BASH_COMMAND =~ $_MD_EXCLUDE ]] && return 0
         
-        _md_current_cmd="$BASH_COMMAND"
+        # Get full command line from history (handles pipes correctly)
+        _md_current_cmd="$(history 1 | sed 's/^[ ]*[0-9]*[ ]*//')"
         _md_start="$(_md_filesize)"
         _md_ready=0
         return 0
