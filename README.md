@@ -31,8 +31,17 @@
 
 ## 📦 安装
 
+**一键安装：**
+
 ```bash
-git clone https://github.com/yourname/md.git
+curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
+source ~/.zshrc  # 或 ~/.bashrc
+```
+
+**或手动安装：**
+
+```bash
+git clone https://github.com/Cishoon/md.git
 cd md && ./install.sh
 source ~/.zshrc  # 或 ~/.bashrc
 ```

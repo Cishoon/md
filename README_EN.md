@@ -31,8 +31,17 @@ Got an error? Just type `md` and paste it to your AI assistant.
 
 ## 📦 Installation
 
+**One-line install:**
+
 ```bash
-git clone https://github.com/yourname/md.git
+curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
+source ~/.zshrc  # or ~/.bashrc
+```
+
+**Or manual install:**
+
+```bash
+git clone https://github.com/Cishoon/md.git
 cd md && ./install.sh
 source ~/.zshrc  # or ~/.bashrc
 ```
