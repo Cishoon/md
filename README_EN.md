@@ -36,6 +36,10 @@
 - 🌍 **Cross-platform** - macOS / all Linux distros
 - 🖥️ **SSH friendly** - Run `md` on server, copies to your local clipboard
 
+## 🔮 Roadmap
+
+- [ ] Support tmux versions below 3.2
+
 ## 📦 Installation
 
 ```bash
@@ -81,6 +85,8 @@ CMake Error at CMakeLists.txt:42:
 | SSH Remote | zsh / bash |
 
 > Uses OSC 52 protocol for clipboard access. Requires terminal support (iTerm2, Windows Terminal, Alacritty, kitty, etc.)
+
+> ⚠️ **tmux users**: Currently only supports tmux 3.2+ (requires `set-buffer -w` feature)
 
 ## ⚙️ How It Works
 

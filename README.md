@@ -36,6 +36,10 @@
 - 🌍 **多平台** - macOS / 所有 Linux 发行版
 - 🖥️ **SSH 友好** - 服务器上 `md`，直接复制到本地剪贴板
 
+## 🔮 未来工作
+
+- [ ] 支持 tmux 3.2 以下版本
+
 ## 📦 安装
 
 ```bash
@@ -81,6 +85,8 @@ CMake Error at CMakeLists.txt:42:
 | SSH 远程服务器 | zsh / bash |
 
 > 使用 OSC 52 协议复制到剪贴板，需要终端支持（iTerm2、Windows Terminal、Alacritty、kitty 等现代终端均支持）
+
+> ⚠️ **tmux 用户注意**: 目前仅支持 tmux 3.2 及以上版本（需要 `set-buffer -w` 功能）
 
 ## ⚙️ 原理
 
