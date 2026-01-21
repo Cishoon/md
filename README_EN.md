@@ -44,8 +44,9 @@
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
-source ~/.zshrc  # or ~/.bashrc
 ```
+
+Restart your terminal after installation.
 
 ## 🔧 Usage
 
