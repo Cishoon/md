@@ -8,6 +8,12 @@ MD_FILE="${TMPDIR:-/tmp}/.md_output_$$"
 MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
 _MD_MAX_SIZE=$((32 * 1024 * 1024))
 
+# JetBrains 终端不支持，直接禁用
+if [[ "$TERMINAL_EMULATOR" == *"JetBrains"* ]]; then
+    md() { echo "md: not supported in JetBrains terminal" >&2; return 1; }
+    return 0
+fi
+
 if [[ -z "$_MD_INIT" ]]; then
     _MD_INIT=1
     _MD_LAST_CMD=""
