@@ -1,12 +1,16 @@
 #!/bin/bash
 # md - copy last command and output to clipboard
 
-MD_VERSION="1.2.0"
+MD_VERSION="1.3.0"
 MD_REPO="Cishoon/md"
 MD_RAW_URL="https://raw.githubusercontent.com/$MD_REPO/main"
 MD_FILE="${TMPDIR:-/tmp}/.md_output_$$"
 MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
+MD_EXCLUDE_FILE="$HOME/.md/exclude"
 _MD_MAX_SIZE=$((32 * 1024 * 1024))
+
+# 默认排除列表
+_MD_DEFAULT_EXCLUDE='md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo|nload|iftop|watch|tail|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|bat|delta|ls|ll|la|l|tree|grep|egrep|fgrep|rg|fd|find|ps|df|du|cat|head|file|which|type|echo|printf|date|cal|whoami|hostname|uname|id|env|set|export|alias|source|\.'
 
 [[ $- != *i* ]] && return
 
@@ -16,13 +20,27 @@ if [[ "$TERMINAL_EMULATOR" == *"JetBrains"* ]]; then
     return 0
 fi
 
+# 构建排除正则
+_md_build_exclude() {
+    local user_exclude=""
+    if [[ -f "$MD_EXCLUDE_FILE" ]]; then
+        user_exclude=$(grep -v '^#' "$MD_EXCLUDE_FILE" 2>/dev/null | grep -v '^$' | tr '\n' '|' | sed 's/|$//')
+    fi
+    
+    if [[ -n "$user_exclude" ]]; then
+        _MD_EXCLUDE="^[[:space:]]*(${_MD_DEFAULT_EXCLUDE}|${user_exclude})([[:space:]]|\$)"
+    else
+        _MD_EXCLUDE="^[[:space:]]*(${_MD_DEFAULT_EXCLUDE})([[:space:]]|\$)"
+    fi
+}
+
 if [[ -z "$_MD_INIT" ]]; then
     _MD_INIT=1
     _MD_LAST_CMD=""
     _MD_CURRENT_CMD=""
     _MD_CAPTURE_ACTIVE=0
     _MD_READY=0
-    _MD_EXCLUDE='^[[:space:]]*(md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo|nload|iftop|watch|tail|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|bat|delta)([[:space:]]|$)'
+    _md_build_exclude
     
     _md_mark_prompt() {
         _MD_READY=1
@@ -85,12 +103,10 @@ _md_copy() {
     local osc
     osc=$(printf '\033]52;c;%s\a' "$encoded")
 
-    # Prefer tmux clipboard helper if available; it handles OSC 52 safely
     if [[ -n "$TMUX" ]] && command -v tmux >/dev/null 2>&1; then
         tmux set-buffer -w -- "$input" >/dev/null 2>&1 && return 0
     fi
 
-    # Wrap OSC 52 for tmux so it passes through to the host terminal
     if [[ -n "$TMUX" ]]; then
         printf '\033Ptmux;%s\033\\' "$osc"
     else
@@ -159,6 +175,56 @@ _md_uninstall() {
     echo "Done. Restart shell."
 }
 
+_md_exclude_add() {
+    local cmd="$1"
+    [[ -z "$cmd" ]] && { echo "usage: md exclude add <command>" >&2; return 1; }
+    
+    mkdir -p "$(dirname "$MD_EXCLUDE_FILE")"
+    
+    if grep -qx "$cmd" "$MD_EXCLUDE_FILE" 2>/dev/null; then
+        echo "'$cmd' already excluded"
+    else
+        echo "$cmd" >> "$MD_EXCLUDE_FILE"
+        _md_build_exclude
+        echo "added '$cmd' to exclude list"
+    fi
+}
+
+_md_exclude_rm() {
+    local cmd="$1"
+    [[ -z "$cmd" ]] && { echo "usage: md exclude rm <command>" >&2; return 1; }
+    
+    if [[ ! -f "$MD_EXCLUDE_FILE" ]]; then
+        echo "'$cmd' not in user exclude list"
+        return 1
+    fi
+    
+    if grep -qx "$cmd" "$MD_EXCLUDE_FILE" 2>/dev/null; then
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' "/^${cmd}$/d" "$MD_EXCLUDE_FILE"
+        else
+            sed -i "/^${cmd}$/d" "$MD_EXCLUDE_FILE"
+        fi
+        _md_build_exclude
+        echo "removed '$cmd' from exclude list"
+    else
+        echo "'$cmd' not in user exclude list"
+        return 1
+    fi
+}
+
+_md_exclude_list() {
+    echo "Default excluded commands:"
+    echo "$_MD_DEFAULT_EXCLUDE" | tr '|' '\n' | sed 's/^/  /'
+    echo ""
+    if [[ -f "$MD_EXCLUDE_FILE" ]] && [[ -s "$MD_EXCLUDE_FILE" ]]; then
+        echo "User excluded commands (~/.md/exclude):"
+        grep -v '^#' "$MD_EXCLUDE_FILE" | grep -v '^$' | sed 's/^/  /'
+    else
+        echo "User excluded commands: (none)"
+    fi
+}
+
 md() {
     case "$1" in
         update)
@@ -173,14 +239,26 @@ md() {
             echo "md $MD_VERSION"
             return
             ;;
+        exclude)
+            case "$2" in
+                add) _md_exclude_add "$3" ;;
+                rm|remove) _md_exclude_rm "$3" ;;
+                list|ls|"") _md_exclude_list ;;
+                *) echo "usage: md exclude [add|rm|list] [command]" >&2; return 1 ;;
+            esac
+            return
+            ;;
         help|-h|--help)
             echo "md - copy last command and output to clipboard"
             echo ""
             echo "Usage:"
-            echo "  md            copy last command to clipboard"
-            echo "  md update     update to latest version"
-            echo "  md uninstall  remove md"
-            echo "  md version    show version"
+            echo "  md                    copy last command to clipboard"
+            echo "  md exclude list       show excluded commands"
+            echo "  md exclude add <cmd>  add command to exclude list"
+            echo "  md exclude rm <cmd>   remove command from exclude list"
+            echo "  md update             update to latest version"
+            echo "  md uninstall          remove md"
+            echo "  md version            show version"
             return
             ;;
     esac
