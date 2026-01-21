@@ -71,10 +71,15 @@ CMake Error at CMakeLists.txt:42:
 | Command | Description |
 |:-------:|:------------|
 | `md` | Copy last command to clipboard |
+| `md exclude list` | Show excluded commands |
+| `md exclude add <cmd>` | Add command to exclude list |
+| `md exclude rm <cmd>` | Remove command from exclude list |
 | `md update` | Update to latest version |
 | `md uninstall` | Uninstall |
 | `md version` | Show version |
 | `md help` | Help |
+
+> Excluded commands won't have their output captured, preserving original display. User config saved in `~/.md/exclude`
 
 ## 🖥️ Supported Platforms
 

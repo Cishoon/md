@@ -71,10 +71,15 @@ CMake Error at CMakeLists.txt:42:
 | 命令 | 说明 |
 |:----:|:-----|
 | `md` | 复制上一条命令到剪贴板 |
+| `md exclude list` | 查看排除的命令列表 |
+| `md exclude add <cmd>` | 添加命令到排除列表 |
+| `md exclude rm <cmd>` | 从排除列表移除命令 |
 | `md update` | 更新到最新版本 |
 | `md uninstall` | 卸载 |
 | `md version` | 显示版本 |
 | `md help` | 帮助 |
+
+> 排除列表中的命令不会被捕获输出，保持原有显示效果。用户自定义配置保存在 `~/.md/exclude`
 
 ## 🖥️ 支持平台
 
