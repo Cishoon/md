@@ -48,6 +48,19 @@ fi
 _md_copy() {
     local input
     input=$(cat)
+
+    # 本地环境优先用原生剪贴板命令
+    if [[ -z "$SSH_TTY" && -z "$SSH_CLIENT" ]]; then
+        if command -v pbcopy &>/dev/null; then
+            printf '%s' "$input" | pbcopy && return 0
+        elif command -v xclip &>/dev/null; then
+            printf '%s' "$input" | xclip -selection clipboard && return 0
+        elif command -v xsel &>/dev/null; then
+            printf '%s' "$input" | xsel --clipboard && return 0
+        fi
+    fi
+
+    # SSH 远程或无本地剪贴板时用 OSC 52
     local encoded
     encoded=$(printf '%s' "$input" | base64 | tr -d '\n')
     local osc
