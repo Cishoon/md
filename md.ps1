@@ -594,16 +594,9 @@ if (-not $script:_MD_INIT) {
     } -ArgumentList @($null, $script:MD_UPDATE_CHECK, $script:MD_RAW_URL, $script:MD_VERSION) | Out-Null
 }
 
-# 清理函数：在 PowerShell 退出时调用
-$ExecutionContext.SessionState.Module.OnRemove = {
-    try { Stop-Transcript -ErrorAction SilentlyContinue } catch {}
-    Remove-Item $script:MD_TRANSCRIPT_FILE -Force -ErrorAction SilentlyContinue
-    Remove-Item $script:MD_FILE -Force -ErrorAction SilentlyContinue
-}
-
-# 注册退出事件
+# 注册退出事件清理临时文件
 Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
     try { Stop-Transcript -ErrorAction SilentlyContinue } catch {}
     Remove-Item "$env:TEMP\.md_transcript_$PID.log" -Force -ErrorAction SilentlyContinue
     Remove-Item "$env:TEMP\.md_output_$PID.log" -Force -ErrorAction SilentlyContinue
-} | Out-Null
+} -SupportEvent | Out-Null
