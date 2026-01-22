@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-blue" alt="Platform">
-  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash-green" alt="Shell">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash%20%7C%20PowerShell-green" alt="Shell">
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
 </p>
 
@@ -42,9 +42,19 @@
 
 ## 📦 安装
 
+### Bash / Zsh (macOS / Linux)
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
 ```
+
+### PowerShell (Windows / macOS / Linux)
+
+```powershell
+irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
+```
+
+> ⚠️ PowerShell 版本会覆盖内置的 `md` 别名（mkdir 的简写），请使用 `mkdir` 或 `New-Item` 创建目录
 
 安装完成后重启终端。
 
@@ -87,8 +97,9 @@ CMake Error at CMakeLists.txt:42:
 
 | 平台 | Shell | 
 |:----:|:-----:|
-| macOS | zsh / bash |
-| Linux (所有发行版) | zsh / bash |
+| macOS | zsh / bash / PowerShell |
+| Linux (所有发行版) | zsh / bash / PowerShell |
+| Windows | PowerShell |
 | SSH 远程服务器 | zsh / bash |
 
 > 使用 OSC 52 协议复制到剪贴板，需要终端支持（iTerm2、Windows Terminal、Alacritty、kitty 等现代终端均支持）
@@ -101,6 +112,7 @@ CMake Error at CMakeLists.txt:42:
 
 - **zsh**: `preexec` / `precmd` hooks
 - **bash**: `DEBUG` trap + `PROMPT_COMMAND`
+- **PowerShell**: `Start-Transcript` + PSReadLine `CommandValidationHandler` + `prompt` 函数重写
 
 ## 📄 License
 
