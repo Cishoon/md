@@ -10,11 +10,11 @@ MD_EXCLUDE_FILE="$HOME/.md/exclude"
 _MD_MAX_SIZE=$((32 * 1024 * 1024))
 
 # 默认排除列表（仅交互式命令）
-_MD_DEFAULT_EXCLUDE='md|mdd|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll'
+_MD_DEFAULT_EXCLUDE="$MD_CMD_NAME"'|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll'
 
 # JetBrains 终端不支持，直接禁用
 if [[ "$TERMINAL_EMULATOR" == *"JetBrains"* ]]; then
-    md() { echo "md: not supported in JetBrains terminal" >&2; return 1; }
+    $MD_CMD_NAME() { echo "md: not supported in JetBrains terminal" >&2; return 1; }
     return 0
 fi
 
@@ -75,6 +75,9 @@ _md_copy() {
             printf '%s' "$input" | xclip -selection clipboard && return 0
         elif command -v xsel &>/dev/null; then
             printf '%s' "$input" | xsel --clipboard && return 0
+        elif command -v termux-clipboard-set &>/dev/null; then
+            # 适配 Termux 用户
+            termux-clipboard-set "$input"
         fi
     fi
 
