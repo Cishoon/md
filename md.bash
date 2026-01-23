@@ -10,7 +10,7 @@ MD_EXCLUDE_FILE="$HOME/.md/exclude"
 _MD_MAX_SIZE=$((32 * 1024 * 1024))
 
 # 默认排除列表（仅交互式命令）
-_MD_DEFAULT_EXCLUDE='md|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll|la|l'
+_MD_DEFAULT_EXCLUDE='md|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll'
 
 [[ $- != *i* ]] && return
 

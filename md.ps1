@@ -20,7 +20,7 @@ $script:_MD_DEFAULT_EXCLUDE = @(
     'vim', 'vi', 'nano', 'less', 'more', 'top', 'htop', 'man',
     'ssh', 'nload', 'iftop', 'watch', 'tmux', 'screen',
     'emacs', 'nvim', 'mc', 'ranger', 'lazygit', 'tig', 'fzf',
-    'ls', 'll', 'la', 'l', 'dir'
+    'ls', 'll'
 )
 
 # 状态变量
