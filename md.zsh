@@ -9,8 +9,8 @@ MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
 MD_EXCLUDE_FILE="$HOME/.md/exclude"
 _MD_MAX_SIZE=$((32 * 1024 * 1024))
 
-# 默认排除列表
-_MD_DEFAULT_EXCLUDE='md|clear|reset|exit|cd|pwd|history|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|sudo|nload|iftop|watch|tail|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|bat|delta|ls|ll|la|l|tree|grep|egrep|fgrep|rg|fd|find|ps|df|du|cat|head|file|which|type|echo|printf|date|cal|whoami|hostname|uname|id|env|set|export|alias|source|\.'
+# 默认排除列表（仅交互式命令）
+_MD_DEFAULT_EXCLUDE='md|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll|la|l'
 
 # JetBrains 终端不支持，直接禁用
 if [[ "$TERMINAL_EMULATOR" == *"JetBrains"* ]]; then

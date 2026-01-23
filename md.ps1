@@ -14,18 +14,13 @@ $script:MD_EXCLUDE_FILE = Join-Path $MD_DIR "exclude"
 $script:MD_TRANSCRIPT_FILE = Join-Path $env:TEMP ".md_transcript_$PID.log"
 $script:_MD_MAX_SIZE = 32 * 1024 * 1024
 
-# 默认排除列表
+# 默认排除列表（仅交互式命令）
 $script:_MD_DEFAULT_EXCLUDE = @(
-    'md', 'clear', 'cls', 'reset', 'exit', 'cd', 'pwd', 'history',
+    'md', 'clear', 'cls', 'reset', 'exit',
     'vim', 'vi', 'nano', 'less', 'more', 'top', 'htop', 'man',
-    'ssh', 'sudo', 'nload', 'iftop', 'watch', 'tail', 'tmux', 'screen',
-    'emacs', 'nvim', 'mc', 'ranger', 'lazygit', 'tig', 'fzf', 'bat', 'delta',
-    'ls', 'll', 'la', 'l', 'dir', 'tree', 'grep', 'rg', 'fd', 'find',
-    'ps', 'df', 'du', 'cat', 'gc', 'head', 'file', 'which', 'type',
-    'echo', 'Write-Host', 'Write-Output', 'date', 'cal', 'whoami', 'hostname',
-    'uname', 'id', 'env', 'set', 'export', 'alias', 'source', '.',
-    'Get-ChildItem', 'Get-Location', 'Set-Location', 'Get-Content', 'Get-History',
-    'Get-Process', 'Get-Service', 'Get-Command', 'Get-Help', 'Get-Member'
+    'ssh', 'nload', 'iftop', 'watch', 'tmux', 'screen',
+    'emacs', 'nvim', 'mc', 'ranger', 'lazygit', 'tig', 'fzf',
+    'ls', 'll', 'la', 'l', 'dir'
 )
 
 # 状态变量
