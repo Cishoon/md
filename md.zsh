@@ -10,7 +10,7 @@ MD_EXCLUDE_FILE="$HOME/.md/exclude"
 _MD_MAX_SIZE=$((32 * 1024 * 1024))
 
 # 默认排除列表（仅交互式命令）
-_MD_DEFAULT_EXCLUDE='md|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll'
+_MD_DEFAULT_EXCLUDE='md|mdd|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll'
 
 # JetBrains 终端不支持，直接禁用
 if [[ "$TERMINAL_EMULATOR" == *"JetBrains"* ]]; then
@@ -201,7 +201,7 @@ _md_exclude_list() {
     fi
 }
 
-md() {
+_md_main() {
     case "$1" in
         update)
             _md_update
@@ -252,3 +252,8 @@ md() {
 
 # Check for updates daily (background, non-blocking)
 (_md_check_update &) 2>/dev/null
+
+# Command name: configurable via MD_CMD_NAME (default: md)
+# Users who prefer 'mdd' can set MD_CMD_NAME=mdd before sourcing
+: "${MD_CMD_NAME:=md}"
+alias "$MD_CMD_NAME"='_md_main'

@@ -1,9 +1,6 @@
 # md - copy last command and output to clipboard (PowerShell version)
 # 需要在 $PROFILE 中 dot-source 此文件: . ~/.md/md.ps1
 
-# 移除 PowerShell 内置的 md 别名 (mkdir 的简写)
-Remove-Item Alias:md -Force -ErrorAction SilentlyContinue
-
 $script:MD_VERSION = "1.4.0"
 $script:MD_REPO = "Cishoon/md"
 $script:MD_RAW_URL = "https://raw.githubusercontent.com/$MD_REPO/main"
@@ -16,7 +13,7 @@ $script:_MD_MAX_SIZE = 32 * 1024 * 1024
 
 # 默认排除列表（仅交互式命令）
 $script:_MD_DEFAULT_EXCLUDE = @(
-    'md', 'clear', 'cls', 'reset', 'exit',
+    'md', 'mdd', 'clear', 'cls', 'reset', 'exit',
     'vim', 'vi', 'nano', 'less', 'more', 'top', 'htop', 'man',
     'ssh', 'nload', 'iftop', 'watch', 'tmux', 'screen',
     'emacs', 'nvim', 'mc', 'ranger', 'lazygit', 'tig', 'fzf',
@@ -467,7 +464,7 @@ function script:_md_help {
 }
 
 # 主函数
-function global:md {
+function global:_md_main {
     param(
         [Parameter(Position = 0)]
         [string]$Command,
@@ -595,3 +592,15 @@ Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
     Remove-Item "$env:TEMP\.md_transcript_$PID.log" -Force -ErrorAction SilentlyContinue
     Remove-Item "$env:TEMP\.md_output_$PID.log" -Force -ErrorAction SilentlyContinue
 } -SupportEvent | Out-Null
+
+# Command name: configurable via MD_CMD_NAME env var (default: md)
+# Users who prefer 'mdd' can set $env:MD_CMD_NAME = "mdd" before sourcing
+$script:MD_CMD_NAME = if ($env:MD_CMD_NAME) { $env:MD_CMD_NAME } else { "md" }
+
+# Remove built-in md alias (mkdir shortcut) only if using 'md' as command name
+if ($script:MD_CMD_NAME -eq "md") {
+    Remove-Item Alias:md -Force -ErrorAction SilentlyContinue
+}
+
+# Create the command alias
+Set-Alias -Name $script:MD_CMD_NAME -Value _md_main -Scope Global

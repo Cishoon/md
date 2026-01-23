@@ -5,6 +5,20 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 INSTALL_DIR="$HOME/.md"
+CMD_NAME="md"  # default command name
+
+# Parse arguments
+for arg in "$@"; do
+    case "$arg" in
+        --cmd=*)
+            CMD_NAME="${arg#*=}"
+            ;;
+        install|uninstall)
+            ACTION="$arg"
+            ;;
+    esac
+done
+ACTION="${ACTION:-install}"
 
 detect_shell() {
     case "$SHELL" in
@@ -68,6 +82,7 @@ install() {
     echo "Platform: $platform"
     echo "Shell: $shell_type"
     echo "Config: $rc_file"
+    echo "Command: $CMD_NAME"
     echo ""
     
     if ! check_clipboard; then
@@ -91,10 +106,11 @@ install() {
     if grep -q '\.md/md\.sh' "$rc_file" 2>/dev/null; then
         echo "md already configured in $rc_file"
     else
-        cat >> "$rc_file" << 'EOF'
+        cat >> "$rc_file" << EOF
 
 # md - copy last command to clipboard
-source "$HOME/.md/md.sh"
+MD_CMD_NAME="$CMD_NAME"
+source "\$HOME/.md/md.sh"
 EOF
         echo "Added to $rc_file"
     fi
@@ -103,7 +119,7 @@ EOF
     echo "Done!"
     echo ""
     echo "Run: source $rc_file"
-    echo "Usage: run any command, then type 'md' to copy"
+    echo "Usage: run any command, then type '$CMD_NAME' to copy"
     echo "Uninstall: $SCRIPT_DIR/install.sh uninstall"
 }
 
@@ -117,9 +133,11 @@ uninstall() {
         if [[ "$(uname)" == "Darwin" ]]; then
             sed -i '' '/\.md\/md\.sh/d' "$rc_file"
             sed -i '' '/md - copy last command/d' "$rc_file"
+            sed -i '' '/MD_CMD_NAME=/d' "$rc_file"
         else
             sed -i '/\.md\/md\.sh/d' "$rc_file"
             sed -i '/md - copy last command/d' "$rc_file"
+            sed -i '/MD_CMD_NAME=/d' "$rc_file"
         fi
         echo "Removed from $rc_file"
     fi
@@ -132,8 +150,8 @@ uninstall() {
     echo "Done! Restart terminal to take effect."
 }
 
-case "${1:-install}" in
+case "$ACTION" in
     install) install ;;
     uninstall) uninstall ;;
-    *) echo "Usage: $0 [install|uninstall]" ;;
+    *) echo "Usage: $0 [install|uninstall] [--cmd=md|mdd]" ;;
 esac

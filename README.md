@@ -48,13 +48,33 @@
 curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
 ```
 
+<details>
+<summary>💡 习惯用 md 当 mkdir？可以改用 mdd 命令</summary>
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | MD_CMD_NAME=mdd bash
+```
+
+这样安装后使用 `mdd` 代替 `md`，不会影响你的 `md` 习惯。
+
+</details>
+
 ### PowerShell 7 (Windows)
 
 ```powershell
 irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
 ```
 
-> ⚠️ 需要 PowerShell 7 或更高版本。会覆盖内置的 `md` 别名（mkdir 的简写），请使用 `mkdir` 或 `New-Item` 创建目录
+> ⚠️ 需要 PowerShell 7 或更高版本。默认会覆盖内置的 `md` 别名（mkdir 的简写）
+
+<details>
+<summary>💡 想保留 md 作为 mkdir？可以改用 mdd 命令</summary>
+
+```powershell
+$env:MD_CMD_NAME = "mdd"; irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
+```
+
+</details>
 
 <details>
 <summary>没有 PowerShell 7？</summary>

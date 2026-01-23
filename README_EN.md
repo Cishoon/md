@@ -48,13 +48,33 @@
 curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
 ```
 
+<details>
+<summary>💡 Prefer using md as mkdir? Use mdd instead</summary>
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | MD_CMD_NAME=mdd bash
+```
+
+This installs with `mdd` as the command name, leaving your `md` habit intact.
+
+</details>
+
 ### PowerShell 7 (Windows)
 
 ```powershell
 irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
 ```
 
-> ⚠️ Requires PowerShell 7 or later. Overrides the built-in `md` alias (shortcut for mkdir). Use `mkdir` or `New-Item` to create directories.
+> ⚠️ Requires PowerShell 7 or later. By default overrides the built-in `md` alias (shortcut for mkdir).
+
+<details>
+<summary>💡 Want to keep md as mkdir? Use mdd instead</summary>
+
+```powershell
+$env:MD_CMD_NAME = "mdd"; irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
+```
+
+</details>
 
 <details>
 <summary>Don't have PowerShell 7? Click to install</summary>

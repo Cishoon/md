@@ -1,12 +1,16 @@
 #!/bin/bash
 # md online installer
 # Usage: curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
+# Or:    curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | MD_CMD_NAME=mdd bash
 
 set -e
 
 REPO="Cishoon/md"
 INSTALL_DIR="$HOME/.md"
 RAW_URL="https://raw.githubusercontent.com/$REPO/main"
+
+# Use MD_CMD_NAME env var if set, otherwise default to "md"
+CMD_NAME="${MD_CMD_NAME:-md}"
 
 detect_shell() {
     case "$SHELL" in
@@ -34,7 +38,7 @@ main() {
     shell_type="$(detect_shell)"
     rc_file="$(get_rc_file)"
     
-    echo "Installing md..."
+    echo "Installing md (command: $CMD_NAME)..."
     echo "Shell: $shell_type"
     echo ""
     
@@ -52,10 +56,11 @@ main() {
     if grep -q '\.md/md\.sh' "$rc_file" 2>/dev/null; then
         echo "md already configured in $rc_file"
     else
-        cat >> "$rc_file" << 'EOF'
+        cat >> "$rc_file" << EOF
 
 # md - copy last command to clipboard
-source "$HOME/.md/md.sh"
+MD_CMD_NAME="$CMD_NAME"
+source "\$HOME/.md/md.sh"
 EOF
         echo "Added to $rc_file"
     fi
@@ -64,7 +69,7 @@ EOF
     echo "Done!"
     echo ""
     echo "Run: source $rc_file"
-    echo "Then type any command, and use 'md' to copy it."
+    echo "Then type any command, and use '$CMD_NAME' to copy it."
 }
 
 main
