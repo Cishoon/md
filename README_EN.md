@@ -14,7 +14,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-blue" alt="Platform">
-  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash%20%7C%20PowerShell-green" alt="Shell">
+  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash%20%7C%20PowerShell%207-green" alt="Shell">
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
 </p>
 
@@ -48,13 +48,22 @@
 curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
 ```
 
-### PowerShell (Windows / macOS / Linux)
+### PowerShell 7 (Windows)
 
 ```powershell
 irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
 ```
 
-> ⚠️ PowerShell version overrides the built-in `md` alias (shortcut for mkdir). Use `mkdir` or `New-Item` to create directories.
+> ⚠️ Requires PowerShell 7 or later. Overrides the built-in `md` alias (shortcut for mkdir). Use `mkdir` or `New-Item` to create directories.
+
+<details>
+<summary>Don't have PowerShell 7? Click to install</summary>
+
+```powershell
+winget install Microsoft.PowerShell
+```
+
+</details>
 
 Restart your terminal after installation.
 
@@ -96,9 +105,9 @@ CMake Error at CMakeLists.txt:42:
 
 | Platform | Shell | 
 |:--------:|:-----:|
-| macOS | zsh / bash / PowerShell |
-| Linux (all distros) | zsh / bash / PowerShell |
-| Windows | PowerShell |
+| macOS | zsh / bash |
+| Linux (all distros) | zsh / bash |
+| Windows | PowerShell 7 |
 | SSH Remote | zsh / bash |
 
 > Uses OSC 52 protocol for clipboard access. Requires terminal support (iTerm2, Windows Terminal, Alacritty, kitty, etc.)
@@ -111,7 +120,7 @@ Uses shell hooks to intercept stdout/stderr before and after command execution, 
 
 - **zsh**: `preexec` / `precmd` hooks
 - **bash**: `DEBUG` trap + `PROMPT_COMMAND`
-- **PowerShell**: `Start-Transcript` + PSReadLine `CommandValidationHandler` + `prompt` function override
+- **PowerShell 7**: `Start-Transcript` + PSReadLine `CommandValidationHandler` + `prompt` function override
 
 ## 📄 License
 
