@@ -57,10 +57,12 @@ irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
 > ⚠️ 需要 PowerShell 7 或更高版本。会覆盖内置的 `md` 别名（mkdir 的简写），请使用 `mkdir` 或 `New-Item` 创建目录
 
 <details>
-<summary>没有 PowerShell 7？点击安装</summary>
+<summary>没有 PowerShell 7？</summary>
 
 ```powershell
-winget install Microsoft.PowerShell
+winget install --id Microsoft.PowerShell -e
+
+$PSVersionTable # 查看版本
 ```
 
 </details>
