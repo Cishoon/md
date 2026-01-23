@@ -89,6 +89,17 @@ CMake Error at CMakeLists.txt:42:
 ...
 ```
 
+### 排除特定命令
+
+安装 `md` 后，某些命令会检测输出环境是否为 TTY，显示不同的样式（如带颜色的输出），或者是可交互的（如 `nload`、`htop`），可能会无法正常显示或使用。
+
+可以手动使用 `md exclude add <cmd>` 排除这些命令：
+
+```bash
+md exclude add nload
+md exclude add htop
+```
+
 ## 📖 命令
 
 | 命令 | 说明 |

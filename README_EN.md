@@ -88,6 +88,17 @@ CMake Error at CMakeLists.txt:42:
 ...
 ```
 
+### Excluding Specific Commands
+
+After installing `md`, some commands detect whether the output is a TTY and display different styles (e.g., colored output), or are interactive (e.g., `nload`, `htop`), which may not display or work properly.
+
+You can manually exclude these commands using `md exclude add <cmd>`:
+
+```bash
+md exclude add nload
+md exclude add htop
+```
+
 ## 📖 Commands
 
 | Command | Description |
