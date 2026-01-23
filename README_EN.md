@@ -60,7 +60,9 @@ irm https://raw.githubusercontent.com/Cishoon/md/main/install-online.ps1 | iex
 <summary>Don't have PowerShell 7? Click to install</summary>
 
 ```powershell
-winget install Microsoft.PowerShell
+winget install --id Microsoft.PowerShell -e
+
+$PSVersionTable # check version
 ```
 
 </details>
