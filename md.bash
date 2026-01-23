@@ -1,7 +1,7 @@
 #!/bin/bash
 # md - copy last command and output to clipboard
 
-MD_VERSION="1.3.0"
+MD_VERSION="1.4.0"
 MD_REPO="Cishoon/md"
 MD_RAW_URL="https://raw.githubusercontent.com/$MD_REPO/main"
 MD_FILE="${TMPDIR:-/tmp}/.md_output_$$"

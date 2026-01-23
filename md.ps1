@@ -4,7 +4,7 @@
 # 移除 PowerShell 内置的 md 别名 (mkdir 的简写)
 Remove-Item Alias:md -Force -ErrorAction SilentlyContinue
 
-$script:MD_VERSION = "1.3.0"
+$script:MD_VERSION = "1.4.0"
 $script:MD_REPO = "Cishoon/md"
 $script:MD_RAW_URL = "https://raw.githubusercontent.com/$MD_REPO/main"
 $script:MD_DIR = Join-Path $HOME ".md"
