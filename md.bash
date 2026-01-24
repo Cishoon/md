@@ -9,14 +9,17 @@ MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
 MD_EXCLUDE_FILE="$HOME/.md/exclude"
 _MD_MAX_SIZE=$((32 * 1024 * 1024))
 
+# Command name: configurable via MD_CMD_NAME (default: md)
+: "${MD_CMD_NAME:=md}"
+
 # 默认排除列表（仅交互式命令）
-_MD_DEFAULT_EXCLUDE='md|mdd|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll'
+_MD_DEFAULT_EXCLUDE="$MD_CMD_NAME"'|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll'
 
 [[ $- != *i* ]] && return
 
 # JetBrains 终端不支持，直接禁用
 if [[ "$TERMINAL_EMULATOR" == *"JetBrains"* ]]; then
-    md() { echo "md: not supported in JetBrains terminal" >&2; return 1; }
+    $MD_CMD_NAME() { echo "md: not supported in JetBrains terminal" >&2; return 1; }
     return 0
 fi
 
@@ -94,6 +97,9 @@ _md_copy() {
             printf '%s' "$input" | xclip -selection clipboard && return 0
         elif command -v xsel &>/dev/null; then
             printf '%s' "$input" | xsel --clipboard && return 0
+        elif command -v termux-clipboard-set &>/dev/null; then
+            # 适配 Termux 用户
+            printf '%s' "$input" | termux-clipboard-set && return 0
         fi
     fi
 
@@ -277,7 +283,4 @@ _md_main() {
 # Check for updates daily (background, non-blocking)
 (_md_check_update &) 2>/dev/null
 
-# Command name: configurable via MD_CMD_NAME (default: md)
-# Users who prefer 'mdd' can set MD_CMD_NAME=mdd before sourcing
-: "${MD_CMD_NAME:=md}"
 alias "$MD_CMD_NAME"='_md_main'

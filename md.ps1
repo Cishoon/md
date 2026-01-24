@@ -11,9 +11,12 @@ $script:MD_EXCLUDE_FILE = Join-Path $MD_DIR "exclude"
 $script:MD_TRANSCRIPT_FILE = Join-Path $env:TEMP ".md_transcript_$PID.log"
 $script:_MD_MAX_SIZE = 32 * 1024 * 1024
 
+# Command name: configurable via MD_CMD_NAME env var (default: md)
+$script:MD_CMD_NAME = if ($env:MD_CMD_NAME) { $env:MD_CMD_NAME } else { "md" }
+
 # 默认排除列表（仅交互式命令）
 $script:_MD_DEFAULT_EXCLUDE = @(
-    'md', 'mdd', 'clear', 'cls', 'reset', 'exit',
+    $script:MD_CMD_NAME, 'clear', 'cls', 'reset', 'exit',
     'vim', 'vi', 'nano', 'less', 'more', 'top', 'htop', 'man',
     'ssh', 'nload', 'iftop', 'watch', 'tmux', 'screen',
     'emacs', 'nvim', 'mc', 'ranger', 'lazygit', 'tig', 'fzf',
@@ -202,6 +205,13 @@ function script:_md_copy {
             if (Get-Command xsel -ErrorAction SilentlyContinue) {
                 try {
                     $text | xsel --clipboard
+                    return $true
+                } catch {}
+            }
+            # 适配 Termux 用户
+            if (Get-Command termux-clipboard-set -ErrorAction SilentlyContinue) {
+                try {
+                    $text | termux-clipboard-set
                     return $true
                 } catch {}
             }
@@ -592,10 +602,6 @@ Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
     Remove-Item "$env:TEMP\.md_transcript_$PID.log" -Force -ErrorAction SilentlyContinue
     Remove-Item "$env:TEMP\.md_output_$PID.log" -Force -ErrorAction SilentlyContinue
 } -SupportEvent | Out-Null
-
-# Command name: configurable via MD_CMD_NAME env var (default: md)
-# Users who prefer 'mdd' can set $env:MD_CMD_NAME = "mdd" before sourcing
-$script:MD_CMD_NAME = if ($env:MD_CMD_NAME) { $env:MD_CMD_NAME } else { "md" }
 
 # Remove built-in md alias (mkdir shortcut) only if using 'md' as command name
 if ($script:MD_CMD_NAME -eq "md") {
