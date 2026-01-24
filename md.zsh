@@ -9,6 +9,9 @@ MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
 MD_EXCLUDE_FILE="$HOME/.md/exclude"
 _MD_MAX_SIZE=$((32 * 1024 * 1024))
 
+# Command name: configurable via MD_CMD_NAME (default: md)
+: "${MD_CMD_NAME:=md}"
+
 # 默认排除列表（仅交互式命令）
 _MD_DEFAULT_EXCLUDE="$MD_CMD_NAME"'|clear|reset|exit|fg|bg|vim|vi|nano|less|more|top|htop|man|ssh|nload|iftop|watch|journalctl|tmux|screen|emacs|nvim|mc|ranger|lazygit|tig|fzf|ls|ll'
 
@@ -137,8 +140,7 @@ _md_check_update() {
 
 _md_update() {
     echo "Updating md..."
-    curl -fsSL "$MD_RAW_URL/md.zsh" -o "$HOME/.md/md.sh" && \
-    echo "Updated. Restart shell or run: source ~/.zshrc"
+    curl -fsSL "$MD_RAW_URL/install-online.sh" | MD_CMD_NAME="$MD_CMD_NAME" bash
 }
 
 _md_uninstall() {
@@ -147,6 +149,7 @@ _md_uninstall() {
     local rc_file="$HOME/.zshrc"
     [[ -f "$rc_file" ]] && sed -i '' '/\.md\/md\.sh/d' "$rc_file" 2>/dev/null
     [[ -f "$rc_file" ]] && sed -i '' '/md - copy last command/d' "$rc_file" 2>/dev/null
+    [[ -f "$rc_file" ]] && sed -i '' '/^MD_CMD_NAME=/d' "$rc_file" 2>/dev/null
     
     rm -rf "$HOME/.md"
     rm -f "${TMPDIR:-/tmp}/.md_output_"*
@@ -256,7 +259,4 @@ _md_main() {
 # Check for updates daily (background, non-blocking)
 (_md_check_update &) 2>/dev/null
 
-# Command name: configurable via MD_CMD_NAME (default: md)
-# Users who prefer 'mdd' can set MD_CMD_NAME=mdd before sourcing
-: "${MD_CMD_NAME:=md}"
 alias "$MD_CMD_NAME"='_md_main'

@@ -159,8 +159,7 @@ _md_check_update() {
 
 _md_update() {
     echo "Updating md..."
-    curl -fsSL "$MD_RAW_URL/md.bash" -o "$HOME/.md/md.sh" && \
-    echo "Updated. Restart shell or run: source ~/.bashrc"
+    curl -fsSL "$MD_RAW_URL/install-online.sh" | MD_CMD_NAME="$MD_CMD_NAME" bash
 }
 
 _md_uninstall() {
@@ -170,9 +169,11 @@ _md_uninstall() {
     if [[ "$(uname)" == "Darwin" ]]; then
         sed -i '' '/\.md\/md\.sh/d' "$rc_file" 2>/dev/null
         sed -i '' '/md - copy last command/d' "$rc_file" 2>/dev/null
+        sed -i '' '/^MD_CMD_NAME=/d' "$rc_file" 2>/dev/null
     else
         sed -i '/\.md\/md\.sh/d' "$rc_file" 2>/dev/null
         sed -i '/md - copy last command/d' "$rc_file" 2>/dev/null
+        sed -i '/^MD_CMD_NAME=/d' "$rc_file" 2>/dev/null
     fi
     
     rm -rf "$HOME/.md"

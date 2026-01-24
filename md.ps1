@@ -362,9 +362,9 @@ function script:_md_check_update {
 function script:_md_update {
     Write-Host "Updating md..."
     try {
-        $mdPath = Join-Path $script:MD_DIR "md.ps1"
-        Invoke-WebRequest -Uri "$($script:MD_RAW_URL)/md.ps1" -OutFile $mdPath -UseBasicParsing
-        Write-Host "Updated. Restart PowerShell or run: . `$PROFILE"
+        $installScript = Invoke-WebRequest -Uri "$($script:MD_RAW_URL)/install-online.ps1" -UseBasicParsing
+        $env:MD_CMD_NAME = $script:MD_CMD_NAME
+        Invoke-Expression $installScript.Content
     } catch {
         Write-Host "Update failed: $_" -ForegroundColor Red
     }
@@ -379,6 +379,7 @@ function script:_md_uninstall {
         $content = Get-Content $PROFILE -Raw
         $content = $content -replace '(?m)^.*\.md[/\\]md\.ps1.*$\r?\n?', ''
         $content = $content -replace '(?m)^.*md - copy last command.*$\r?\n?', ''
+        $content = $content -replace '(?m)^\$env:MD_CMD_NAME\s*=.*$\r?\n?', ''
         $content | Set-Content $PROFILE
     }
     
