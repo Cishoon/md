@@ -38,6 +38,7 @@
 
 ## 🔮 Roadmap
 
+- [ ] Support Fish Shell
 - [ ] Support tmux versions below 3.2
 
 ## 📦 Installation
