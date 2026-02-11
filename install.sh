@@ -96,12 +96,13 @@ install() {
     echo "Installing..."
     mkdir -p "$INSTALL_DIR"
     
+    cp "$SCRIPT_DIR/md.core.sh" "$INSTALL_DIR/md.core.sh"
     if [[ "$shell_type" == "zsh" ]]; then
         cp "$SCRIPT_DIR/md.zsh" "$INSTALL_DIR/md.sh"
     else
         cp "$SCRIPT_DIR/md.bash" "$INSTALL_DIR/md.sh"
     fi
-    chmod +x "$INSTALL_DIR/md.sh"
+    chmod +x "$INSTALL_DIR/md.sh" "$INSTALL_DIR/md.core.sh"
     
     if grep -q '\.md/md\.sh' "$rc_file" 2>/dev/null; then
         echo "md already configured in $rc_file"

@@ -44,13 +44,17 @@ main() {
     
     mkdir -p "$INSTALL_DIR"
     
-    # Download the appropriate script
+    # Download shared core + shell adapter
+    local shell_script
     if [[ "$shell_type" == "zsh" ]]; then
-        curl -fsSL "$RAW_URL/md.zsh" -o "$INSTALL_DIR/md.sh"
+        shell_script="md.zsh"
     else
-        curl -fsSL "$RAW_URL/md.bash" -o "$INSTALL_DIR/md.sh"
+        shell_script="md.bash"
     fi
-    chmod +x "$INSTALL_DIR/md.sh"
+
+    curl -fsSL "$RAW_URL/md.core.sh" -o "$INSTALL_DIR/md.core.sh"
+    curl -fsSL "$RAW_URL/$shell_script" -o "$INSTALL_DIR/md.sh"
+    chmod +x "$INSTALL_DIR/md.sh" "$INSTALL_DIR/md.core.sh"
     
     # Add to shell config
     if grep -q '\.md/md\.sh' "$rc_file" 2>/dev/null; then
