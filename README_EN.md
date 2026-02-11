@@ -125,6 +125,9 @@ md exclude add htop
 | Command | Description |
 |:-------:|:------------|
 | `md` | Copy last command to clipboard |
+| `md on` | Enable md |
+| `md off` | Disable md (ignore all capture and copy) |
+| `md status` | Show current on/off state |
 | `md exclude list` | Show excluded commands |
 | `md exclude add <cmd>` | Add command to exclude list |
 | `md exclude rm <cmd>` | Remove command from exclude list |

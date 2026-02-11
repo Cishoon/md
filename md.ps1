@@ -8,6 +8,7 @@ $script:MD_DIR = Join-Path $HOME ".md"
 $script:MD_FILE = Join-Path $env:TEMP ".md_output_$PID.log"
 $script:MD_UPDATE_CHECK = Join-Path $MD_DIR ".last_update_check"
 $script:MD_EXCLUDE_FILE = Join-Path $MD_DIR "exclude"
+$script:MD_ENABLED_FILE = Join-Path $MD_DIR "enabled"
 $script:MD_TRANSCRIPT_FILE = Join-Path $env:TEMP ".md_transcript_$PID.log"
 $script:_MD_MAX_SIZE = 32 * 1024 * 1024
 
@@ -289,6 +290,11 @@ function script:_md_finalize_capture {
 function script:_md_pre_hook {
     param([string]$commandAst)
     
+    if (-not (_md_is_enabled)) {
+        $script:_MD_CURRENT_CMD = ""
+        return
+    }
+    
     $cmd = $commandAst.ToString()
     
     if (_md_should_exclude $cmd) {
@@ -460,12 +466,46 @@ function script:_md_exclude_list {
     }
 }
 
+# 检查是否启用
+function script:_md_is_enabled {
+    if (-not (Test-Path $script:MD_ENABLED_FILE)) { return $true }
+    $val = Get-Content $script:MD_ENABLED_FILE -ErrorAction SilentlyContinue
+    return ($val -ne "0")
+}
+
+function script:_md_on {
+    if (-not (Test-Path $script:MD_DIR)) {
+        New-Item -ItemType Directory -Path $script:MD_DIR -Force | Out-Null
+    }
+    "1" | Set-Content $script:MD_ENABLED_FILE -NoNewline
+    Write-Host "md: enabled"
+}
+
+function script:_md_off {
+    if (-not (Test-Path $script:MD_DIR)) {
+        New-Item -ItemType Directory -Path $script:MD_DIR -Force | Out-Null
+    }
+    "0" | Set-Content $script:MD_ENABLED_FILE -NoNewline
+    Write-Host "md: disabled"
+}
+
+function script:_md_status {
+    if (_md_is_enabled) {
+        Write-Host "md: on"
+    } else {
+        Write-Host "md: off"
+    }
+}
+
 # 帮助信息
 function script:_md_help {
     Write-Host "md - copy last command and output to clipboard"
     Write-Host ""
     Write-Host "Usage:"
     Write-Host "  md                    copy last command to clipboard"
+    Write-Host "  md on                 enable md"
+    Write-Host "  md off                disable md (ignore all commands)"
+    Write-Host "  md status             show current on/off state"
     Write-Host "  md exclude list       show excluded commands"
     Write-Host "  md exclude add <cmd>  add command to exclude list"
     Write-Host "  md exclude rm <cmd>   remove command from exclude list"
@@ -488,6 +528,18 @@ function global:_md_main {
     )
     
     switch ($Command) {
+        "on" {
+            _md_on
+            return
+        }
+        "off" {
+            _md_off
+            return
+        }
+        "status" {
+            _md_status
+            return
+        }
         "update" {
             _md_update
             return
@@ -517,6 +569,10 @@ function global:_md_main {
         }
         "" {
             # 默认行为：复制上一条命令和输出
+            if (-not (_md_is_enabled)) {
+                Write-Host "md: disabled (run 'md on' to enable)" -ForegroundColor Red
+                return
+            }
             if (-not $script:_MD_LAST_CMD -or -not (Test-Path $script:MD_FILE)) {
                 Write-Host "no record" -ForegroundColor Red
                 return

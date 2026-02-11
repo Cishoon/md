@@ -7,6 +7,7 @@ MD_RAW_URL="https://raw.githubusercontent.com/$MD_REPO/main"
 MD_FILE="${TMPDIR:-/tmp}/.md_output_$$"
 MD_UPDATE_CHECK="$HOME/.md/.last_update_check"
 MD_EXCLUDE_FILE="$HOME/.md/exclude"
+MD_ENABLED_FILE="$HOME/.md/enabled"
 _MD_MAX_SIZE=$((32 * 1024 * 1024))
 
 # Command name: configurable via MD_CMD_NAME (default: md)
@@ -43,6 +44,7 @@ if [[ -z "$_MD_INIT" ]]; then
     autoload -Uz add-zsh-hook
     
     _md_preexec() {
+        _md_is_enabled || return
         local cmd="$1"
         [[ "$cmd" =~ $_MD_EXCLUDE ]] && return
         
@@ -207,8 +209,48 @@ _md_exclude_list() {
     fi
 }
 
+_md_is_enabled() {
+    [[ ! -f "$MD_ENABLED_FILE" ]] && return 0
+    local val
+    val=$(cat "$MD_ENABLED_FILE" 2>/dev/null)
+    [[ "$val" == "0" ]] && return 1
+    return 0
+}
+
+_md_on() {
+    mkdir -p "$(dirname "$MD_ENABLED_FILE")"
+    echo "1" > "$MD_ENABLED_FILE"
+    echo "md: enabled"
+}
+
+_md_off() {
+    mkdir -p "$(dirname "$MD_ENABLED_FILE")"
+    echo "0" > "$MD_ENABLED_FILE"
+    echo "md: disabled"
+}
+
+_md_status() {
+    if _md_is_enabled; then
+        echo "md: on"
+    else
+        echo "md: off"
+    fi
+}
+
 _md_main() {
     case "$1" in
+        on)
+            _md_on
+            return
+            ;;
+        off)
+            _md_off
+            return
+            ;;
+        status)
+            _md_status
+            return
+            ;;
         update)
             _md_update
             return
@@ -235,6 +277,9 @@ _md_main() {
             echo ""
             echo "Usage:"
             echo "  md                    copy last command to clipboard"
+            echo "  md on                 enable md"
+            echo "  md off                disable md (ignore all commands)"
+            echo "  md status             show current on/off state"
             echo "  md exclude list       show excluded commands"
             echo "  md exclude add <cmd>  add command to exclude list"
             echo "  md exclude rm <cmd>   remove command from exclude list"
@@ -244,6 +289,11 @@ _md_main() {
             return
             ;;
     esac
+    
+    if ! _md_is_enabled; then
+        echo "md: disabled (run 'md on' to enable)" >&2
+        return 1
+    fi
     
     if [[ -z "$_MD_LAST_CMD" ]] || [[ ! -s "$MD_FILE" ]]; then
         echo "no record" >&2

@@ -126,6 +126,9 @@ md exclude add htop
 | 命令 | 说明 |
 |:----:|:-----|
 | `md` | 复制上一条命令到剪贴板 |
+| `md on` | 启用 md |
+| `md off` | 禁用 md（忽略所有捕获和复制） |
+| `md status` | 查看当前启用/禁用状态 |
 | `md exclude list` | 查看排除的命令列表 |
 | `md exclude add <cmd>` | 添加命令到排除列表 |
 | `md exclude rm <cmd>` | 从排除列表移除命令 |
