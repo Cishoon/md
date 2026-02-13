@@ -1,0 +1,34 @@
+{
+    "version": "1.4.0",
+    "description": "Message Dump - Copy last command and output to clipboard",
+    "homepage": "https://github.com/Cishoon/md",
+    "license": "MIT",
+    "url": "https://github.com/Cishoon/md/archive/refs/tags/v1.4.0.zip",
+    "hash": "",
+    "extract_dir": "md-1.4.0",
+    "psmodule": {
+        "name": "MessageDump"
+    },
+    "installer": {
+        "script": [
+            "$mdDir = Join-Path $HOME '.md'",
+            "if (!(Test-Path $mdDir)) { New-Item -ItemType Directory -Path $mdDir -Force | Out-Null }"
+        ]
+    },
+    "uninstaller": {
+        "script": [
+            "try { Stop-Transcript -ErrorAction SilentlyContinue } catch {}",
+            "Remove-Item (Join-Path $HOME '.md') -Recurse -Force -ErrorAction SilentlyContinue",
+            "Remove-Item \"$env:TEMP\\.md_output_*\" -Force -ErrorAction SilentlyContinue",
+            "Remove-Item \"$env:TEMP\\.md_transcript_*\" -Force -ErrorAction SilentlyContinue"
+        ]
+    },
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/Cishoon/md/archive/refs/tags/v$version.zip",
+        "extract_dir": "md-$version",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}
