@@ -26,9 +26,6 @@
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/Cishoon/md/archive/refs/tags/v$version.zip",
-        "extract_dir": "md-$version",
-        "hash": {
-            "url": "$url.sha256"
-        }
+        "extract_dir": "md-$version"
     }
 }
