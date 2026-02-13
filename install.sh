@@ -21,8 +21,27 @@ done
 ACTION="${ACTION:-install}"
 
 detect_shell() {
+    # FISH_VERSION is exported by fish into child processes
+    if [[ -n "$FISH_VERSION" ]]; then
+        echo "fish"
+        return
+    fi
+
+    # Check parent process name (covers interactive invocation from fish)
+    local parent_name=""
+    if [[ -f /proc/$PPID/comm ]]; then
+        parent_name=$(cat /proc/$PPID/comm 2>/dev/null)
+    elif command -v ps &>/dev/null; then
+        parent_name=$(ps -p "$PPID" -o comm= 2>/dev/null)
+    fi
+    case "$parent_name" in
+        fish|*/fish) echo "fish"; return ;;
+    esac
+
+    # Fall back to $SHELL (login shell)
     case "$SHELL" in
         */zsh) echo "zsh" ;;
+        */fish) echo "fish" ;;
         */bash) echo "bash" ;;
         *) 
             if [[ -n "$ZSH_VERSION" ]]; then
@@ -52,6 +71,7 @@ detect_platform() {
 get_rc_file() {
     case "$(detect_shell)" in
         zsh) echo "$HOME/.zshrc" ;;
+        fish) echo "$HOME/.config/fish/config.fish" ;;
         *) echo "$HOME/.bashrc" ;;
     esac
 }
@@ -97,23 +117,42 @@ install() {
     mkdir -p "$INSTALL_DIR"
     
     cp "$SCRIPT_DIR/md.core.sh" "$INSTALL_DIR/md.core.sh"
-    if [[ "$shell_type" == "zsh" ]]; then
+    if [[ "$shell_type" == "fish" ]]; then
+        cp "$SCRIPT_DIR/md.fish" "$INSTALL_DIR/md.fish"
+        chmod +x "$INSTALL_DIR/md.fish"
+    elif [[ "$shell_type" == "zsh" ]]; then
         cp "$SCRIPT_DIR/md.zsh" "$INSTALL_DIR/md.sh"
+        chmod +x "$INSTALL_DIR/md.sh" "$INSTALL_DIR/md.core.sh"
     else
         cp "$SCRIPT_DIR/md.bash" "$INSTALL_DIR/md.sh"
+        chmod +x "$INSTALL_DIR/md.sh" "$INSTALL_DIR/md.core.sh"
     fi
-    chmod +x "$INSTALL_DIR/md.sh" "$INSTALL_DIR/md.core.sh"
     
-    if grep -q '\.md/md\.sh' "$rc_file" 2>/dev/null; then
-        echo "md already configured in $rc_file"
+    if [[ "$shell_type" == "fish" ]]; then
+        mkdir -p "$(dirname "$rc_file")"
+        if grep -q '\.md/md\.fish' "$rc_file" 2>/dev/null; then
+            echo "md already configured in $rc_file"
+        else
+            cat >> "$rc_file" << EOF
+
+# md - copy last command to clipboard
+set -g MD_CMD_NAME "$CMD_NAME"
+source "\$HOME/.md/md.fish"
+EOF
+            echo "Added to $rc_file"
+        fi
     else
-        cat >> "$rc_file" << EOF
+        if grep -q '\.md/md\.sh' "$rc_file" 2>/dev/null; then
+            echo "md already configured in $rc_file"
+        else
+            cat >> "$rc_file" << EOF
 
 # md - copy last command to clipboard
 MD_CMD_NAME="$CMD_NAME"
 source "\$HOME/.md/md.sh"
 EOF
-        echo "Added to $rc_file"
+            echo "Added to $rc_file"
+        fi
     fi
     
     echo ""
@@ -132,13 +171,13 @@ uninstall() {
     
     if [[ -f "$rc_file" ]]; then
         if [[ "$(uname)" == "Darwin" ]]; then
-            sed -i '' '/\.md\/md\.sh/d' "$rc_file"
+            sed -i '' '/\.md\/md\.\(sh\|fish\)/d' "$rc_file"
             sed -i '' '/md - copy last command/d' "$rc_file"
-            sed -i '' '/MD_CMD_NAME=/d' "$rc_file"
+            sed -i '' '/MD_CMD_NAME/d' "$rc_file"
         else
-            sed -i '/\.md\/md\.sh/d' "$rc_file"
+            sed -i '/\.md\/md\.\(sh\|fish\)/d' "$rc_file"
             sed -i '/md - copy last command/d' "$rc_file"
-            sed -i '/MD_CMD_NAME=/d' "$rc_file"
+            sed -i '/MD_CMD_NAME/d' "$rc_file"
         fi
         echo "Removed from $rc_file"
     fi

@@ -14,7 +14,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-blue" alt="Platform">
-  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash%20%7C%20PowerShell%207-green" alt="Shell">
+  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash%20%7C%20fish%20%7C%20PowerShell%207-green" alt="Shell">
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
 </p>
 
@@ -38,12 +38,11 @@
 
 ## 🔮 未来工作
 
-- [ ] 支持 Fish Shell
 - [ ] 支持 tmux 3.2 以下版本
 
 ## 📦 安装
 
-### Bash / Zsh (macOS / Linux)
+### Bash / Zsh / Fish (macOS / Linux)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
@@ -143,10 +142,10 @@ md exclude add htop
 
 | 平台 | Shell | 
 |:----:|:-----:|
-| macOS | zsh / bash |
-| Linux (所有发行版) | zsh / bash |
+| macOS | zsh / bash / fish |
+| Linux (所有发行版) | zsh / bash / fish |
 | Windows | PowerShell 7 |
-| SSH 远程服务器 | zsh / bash |
+| SSH 远程服务器 | zsh / bash / fish |
 
 > 使用 OSC 52 协议复制到剪贴板，需要终端支持（iTerm2、Windows Terminal、Alacritty、kitty 等现代终端均支持）
 
@@ -158,6 +157,7 @@ md exclude add htop
 
 - **zsh**: `preexec` / `precmd` hooks
 - **bash**: `DEBUG` trap + `PROMPT_COMMAND`
+- **fish**: `script(1)` 全局捕获 + `fish_preexec` / `fish_postexec` 偏移切片
 - **PowerShell 7**: `Start-Transcript` + PSReadLine `CommandValidationHandler` + `prompt` 函数重写
 
 ## 📄 License

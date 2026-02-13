@@ -14,7 +14,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-blue" alt="Platform">
-  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash%20%7C%20PowerShell%207-green" alt="Shell">
+  <img src="https://img.shields.io/badge/shell-zsh%20%7C%20bash%20%7C%20fish%20%7C%20PowerShell%207-green" alt="Shell">
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
 </p>
 
@@ -38,12 +38,11 @@
 
 ## 🔮 Roadmap
 
-- [ ] Support Fish Shell
 - [ ] Support tmux versions below 3.2
 
 ## 📦 Installation
 
-### Bash / Zsh (macOS / Linux)
+### Bash / Zsh / Fish (macOS / Linux)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Cishoon/md/main/install-online.sh | bash
@@ -142,10 +141,10 @@ md exclude add htop
 
 | Platform | Shell | 
 |:--------:|:-----:|
-| macOS | zsh / bash |
-| Linux (all distros) | zsh / bash |
+| macOS | zsh / bash / fish |
+| Linux (all distros) | zsh / bash / fish |
 | Windows | PowerShell 7 |
-| SSH Remote | zsh / bash |
+| SSH Remote | zsh / bash / fish |
 
 > Uses OSC 52 protocol for clipboard access. Requires terminal support (iTerm2, Windows Terminal, Alacritty, kitty, etc.)
 
@@ -157,6 +156,7 @@ Uses shell hooks to intercept stdout/stderr before and after command execution, 
 
 - **zsh**: `preexec` / `precmd` hooks
 - **bash**: `DEBUG` trap + `PROMPT_COMMAND`
+- **fish**: `script(1)` session capture + `fish_preexec` / `fish_postexec` offset slicing
 - **PowerShell 7**: `Start-Transcript` + PSReadLine `CommandValidationHandler` + `prompt` function override
 
 ## 📄 License
