@@ -39,6 +39,8 @@
 ## 🔮 Roadmap
 
 - [ ] Support tmux versions below 3.2
+- [ ] Terminal progress bar trimming (strip redundant `\r` carriage-return overwrites)
+- [ ] fzf integration for searching historical output
 
 ## 📦 Installation
 
